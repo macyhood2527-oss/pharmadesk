@@ -374,6 +374,34 @@ const seedData = () => {
 
 };
 
+const removeDemoData = () => {
+  const tablesToClear = [
+    'return_items',
+    'returns',
+    'sale_items',
+    'sales',
+    'stock_movements',
+    'purchase_receipt_items',
+    'purchase_receipts',
+    'product_batches',
+    'products',
+    'suppliers',
+    'categories'
+  ];
+
+  db.transaction(() => {
+    tablesToClear.forEach((table) => {
+      db.prepare(`DELETE FROM ${table}`).run();
+    });
+
+    db.prepare("DELETE FROM users WHERE email = 'cashier@pharmadesk.com'").run();
+
+    tablesToClear.concat('users').forEach((table) => {
+      db.prepare('DELETE FROM sqlite_sequence WHERE name = ?').run(table);
+    });
+  })();
+};
+
 const initializeDatabase = () => {
   initSchema();
 };
@@ -381,4 +409,5 @@ const initializeDatabase = () => {
 module.exports = db;
 module.exports.initSchema = initSchema;
 module.exports.seedData = seedData;
+module.exports.removeDemoData = removeDemoData;
 module.exports.initializeDatabase = initializeDatabase;

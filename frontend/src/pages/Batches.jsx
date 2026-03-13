@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api.js';
+import { fetchAllPages } from '../services/paginatedFetch.js';
 import { formatPeso } from '../utils/currency.js';
 import { formatDateOnly } from '../utils/dates.js';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
@@ -49,12 +50,12 @@ const Batches = () => {
 
       const [batchesRes, productsRes, suppliersRes] = await Promise.all([
         api.get(`/batches?${batchParams.toString()}`),
-        api.get('/products?limit=100'),
+        fetchAllPages('/products', { dataKey: 'products' }),
         api.get('/suppliers')
       ]);
       setBatches(batchesRes.data.batches);
       setPagination(batchesRes.data.pagination);
-      setProducts(productsRes.data.products);
+      setProducts(productsRes);
       setSuppliers(suppliersRes.data);
     } catch (err) {
       console.error('Failed to load batches', err);

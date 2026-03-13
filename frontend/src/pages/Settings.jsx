@@ -52,6 +52,8 @@ const Settings = () => {
   const [importing, setImporting] = useState(false);
   const [pendingImport, setPendingImport] = useState(null);
   const [restoreConfirmation, setRestoreConfirmation] = useState('');
+  const [clearDemoPassword, setClearDemoPassword] = useState('');
+  const [clearingDemo, setClearingDemo] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const fileInputRef = useRef(null);
@@ -154,6 +156,26 @@ const Settings = () => {
     } finally {
       setImporting(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleClearDemoData = async () => {
+    setClearingDemo(true);
+    setError('');
+    setMessage('');
+
+    try {
+      const response = await api.post('/settings/clear-demo', {
+        password: clearDemoPassword
+      });
+      setMessage(response.data.message || 'Demo data cleared successfully.');
+      setClearDemoPassword('');
+      await loadSummary();
+    } catch (err) {
+      console.error('Failed to clear demo data', err);
+      setError(err.response?.data?.error || 'Failed to clear demo data.');
+    } finally {
+      setClearingDemo(false);
     }
   };
 
@@ -347,6 +369,43 @@ const Settings = () => {
             ))}
           </div>
         ) : null}
+      </div>
+
+      <div className="card border border-red-200 bg-red-50/60">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold text-red-950">Danger Zone</h2>
+          <p className="mt-1 text-sm text-red-800">
+            Remove demo data from this database without doing a manual cleanup.
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-red-200 bg-white/80 px-4 py-3 text-sm text-red-800">
+          This removes products, batches, suppliers, categories, sales, returns, receiving records, stock movements,
+          and the demo cashier user. The admin account is kept.
+        </div>
+
+        <div className="mt-4 space-y-2">
+          <label className="block text-sm font-medium text-slate-700">
+            Type the password to clear demo data
+          </label>
+          <input
+            type="password"
+            value={clearDemoPassword}
+            onChange={(event) => setClearDemoPassword(event.target.value)}
+            className="w-full rounded-xl border border-slate-300 px-3 py-3 text-sm focus:border-red-500 focus:ring-2 focus:ring-red-500"
+            placeholder="Enter password"
+          />
+        </div>
+
+        <div className="mt-4">
+          <button
+            className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={handleClearDemoData}
+            disabled={clearingDemo || clearDemoPassword !== 'deleteme'}
+          >
+            {clearingDemo ? 'Clearing Demo Data...' : 'Clear Demo Data'}
+          </button>
+        </div>
       </div>
     </div>
   );

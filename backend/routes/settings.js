@@ -1,4 +1,5 @@
 const express = require('express');
+const { body, validationResult } = require('express-validator');
 const db = require('../db');
 const { TABLES, EXPORT_VERSION, buildExportPayload, getBackupFiles } = require('../backup');
 const { authMiddleware, roleMiddleware } = require('../middleware/auth');
@@ -85,6 +86,22 @@ router.post('/import', (req, res) => {
       db.exec('PRAGMA foreign_keys = ON');
     } catch {}
     res.status(500).json({ error: 'Failed to import backup.' });
+  }
+});
+
+router.post('/clear-demo', [
+  body('password').equals('deleteme')
+], (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: 'Incorrect clear-data password.' });
+  }
+
+  try {
+    db.removeDemoData();
+    res.json({ message: 'Demo data cleared successfully. Admin login was kept.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to clear demo data.' });
   }
 });
 

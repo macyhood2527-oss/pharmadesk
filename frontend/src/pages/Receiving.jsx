@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api.js';
+import { fetchAllPages } from '../services/paginatedFetch.js';
 import { formatPeso } from '../utils/currency.js';
 import { formatDateOnly } from '../utils/dates.js';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
@@ -56,12 +57,12 @@ const Receiving = () => {
     try {
       const [receiptsRes, productsRes, suppliersRes] = await Promise.all([
         api.get(`/receiving?page=${page}&limit=10&search=${encodeURIComponent(search)}`),
-        api.get('/products?limit=100'),
+        fetchAllPages('/products', { dataKey: 'products' }),
         api.get('/suppliers')
       ]);
       setReceipts(receiptsRes.data.receipts);
       setPagination(receiptsRes.data.pagination);
-      setProducts(productsRes.data.products);
+      setProducts(productsRes);
       setSuppliers(suppliersRes.data);
     } catch (err) {
       console.error('Failed to load receiving data', err);

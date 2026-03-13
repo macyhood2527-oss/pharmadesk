@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../services/api.js';
+import { fetchAllPages } from '../services/paginatedFetch.js';
 import { formatPeso } from '../utils/currency.js';
 import { parseDateOnlyToLocalTime } from '../utils/dates.js';
 import {
@@ -51,12 +52,12 @@ const POS = () => {
 
   useEffect(() => {
     Promise.all([
-      api.get('/products?limit=100'),
-      api.get('/batches')
-    ]).then(([productsRes, batchesRes]) => {
-      setProducts(productsRes.data.products);
-      setFilteredProducts(productsRes.data.products);
-      setBatches(batchesRes.data.batches || []);
+      fetchAllPages('/products', { dataKey: 'products' }),
+      fetchAllPages('/batches', { dataKey: 'batches' })
+    ]).then(([allProducts, allBatches]) => {
+      setProducts(allProducts);
+      setFilteredProducts(allProducts);
+      setBatches(allBatches);
     }).catch((err) => {
       console.error('Failed to load POS data', err);
       setError('Failed to load POS data.');
