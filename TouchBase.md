@@ -4,7 +4,13 @@
 This is the running progress/update log for the project.
 
 ## Current Status
-PharmaDesk is now a usable pharmacy POS and inventory demo with admin operations, receiving, returns, reports, and stock audit tracking.
+PharmaDesk is now a usable pharmacy POS and inventory system with admin operations, receiving, returns, reports, stock audit tracking, and simpler deployment for the main pharmacy PC.
+
+## Stack Used
+- frontend: React + Vite + Tailwind CSS
+- backend: Node.js + Express
+- database: SQLite
+- deployment model: local network main-PC setup with browser clients on same LAN
 
 ## Major Progress Completed
 
@@ -66,6 +72,28 @@ PharmaDesk is now a usable pharmacy POS and inventory demo with admin operations
 - DB indexes were added for longer-term performance
 - backup restore now requires explicit `RESTORE` confirmation
 
+### Deployment / Setup Progress
+- one-click first-time setup added for macOS and Windows
+- one-click daily start/stop scripts added for macOS and Windows
+- startup flow now fits a real main-PC-in-pharmacy setup
+- frontend preview startup is included in the launcher flow
+- browser auto-open is included in the launcher flow
+- Node.js guidance was documented clearly for easier installs
+- Node.js 18, 20, or 22 LTS are the recommended versions
+- Node.js 24+ is currently discouraged because of possible `better-sqlite3` native build issues
+
+### LAN / Offline Usage Progress
+- app flow is documented for one main computer plus other same-network devices
+- tablet and browser-client access over local IP is documented
+- frontend bind and backend host/CORS setup are documented for 2-device LAN use
+- daily use on the same local network does not require internet once installed
+
+### Backup / Operations Progress
+- automatic daily backup support was added to the backend
+- backup retention can now be configured
+- backup JSON limit is documented at `50mb`
+- daily users are now pushed toward launcher-based startup instead of terminal-only startup
+
 ## Current Backend DB Commands
 Run inside `backend`:
 
@@ -95,6 +123,8 @@ npm run dev
 - returns reduce net sales
 - voided sales excluded from active totals
 - returned stock goes back to inventory
+- first-time setup now creates only the database structure by default
+- sample cashier/demo records only exist if seed data is intentionally added
 
 ## Remaining Good Next Steps
 - stronger migration system
@@ -103,3 +133,5 @@ npm run dev
 - more reporting filters
 - barcode workflow
 - automated tests for checkout, return, void, and receiving
+- packaging/release hardening for real pharmacy deployment
+- clearer backup restore drills and recovery testing
